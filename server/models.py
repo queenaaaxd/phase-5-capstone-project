@@ -10,71 +10,168 @@ metadata = MetaData(naming_convention={
 
 db = SQLAlchemy(metadata=metadata)
 
-class Hotel(db.Model, SerializerMixin):
-    __tablename__ = 'hotels'
 
-    serialize_rules = ('-reviews',)
+# Models go here!
+class User(db.Model, SerializerMixin) :
+    __tablename__ = 'users'
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False, unique=True)
-    image = db.Column(db.String, nullable=False)
+    id = db.Column( db.Integer, primary_key = True)
+    email = db.Column( db.String, nullable = False, unique = True )
+    password_hash = db.Column( db.String, nullable = False )
+    admin = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
-    reviews = db.relationship('Review', back_populates='hotel')
+    # Add relationship
+    cartitems = db.relationship('CartItem', back_populates='user', cascade='all, delete-orphan')
+    transactions = db.relationship('Transaction', back_populates='user', cascade='all, delete-orphan')
 
-    customers = association_proxy('reviews', 'customer',
-        creator=lambda c: Review(customer=c))
+    # relations Users - Products
+    cart_products = association_proxy('cartitems', 'product', creator=lambda p: Product(product=p))
+    transaction_products = association_proxy('transactions', 'product', creator=lambda t: Product(product=t))
 
-    @validates('name')
-    def validate_name(self, key, value):
-        if len(value) < 5:
-            raise ValueError(f"{key} must be at least 5 characters long.")
-        return value
+    # Add serialization rules
+    serialize_rules = ('-cartitems', '-transactions')
+
+    def __repr__( self ):
+        # print(f'<User email={self.email} id={self.id}>')
+        return f"{{ User { self.id } }}"
+
+    # validation_errors = [] 
+
+    # def get_validation_errors( self ):
+    #     return list( set( self.validation_errors ))
+
+    # @classmethod
+    # def clear_validation_errors( cls ): 
+    #     cls.validation_errors = []
+
+    # @validates( 'email' )
+    # def validate_email( self, key, email ):
+    #     if type(email) is str and email and '@' in email and '.' in email:
+    #         return email
+    #     else:
+    #         raise ValueError(f"{key} must be a valid email address.")
+
+    # #Password stuff for user model!
+    # @hybrid_property
+    # def password_hash( self ):
+    #     return self._password_hash
+
+    # @password_hash.setter
+    # def password_hash( self, password):
+    #     # ***password validation goes in here!!!***
+    #     if type(password) is str and len(password) in range(8, 17):
+    #         password_hash = bcrypt.generate_password_hash (password.encode( 'utf-8' ))
+    #         self._password_hash = password_hash.decode( 'utf-8' )
+    #     else:
+    #         self.validation_errors.append( "Password validation error goes here!" )
     
-    def __repr__(self):
-        return f"Hotel # {self.id}: {self.name} hotel"
+    # def authenticate( self, password):
+    #     return bcrypt.check_password_hash( self._password_hash, password.encode( 'utf-8' ))
 
-class Customer(db.Model, SerializerMixin):
-    __tablename__ = 'customers'
 
-    serialize_rules = ('-reviews',)
+class Transaction(db.Model, SerializerMixin):
+    __tablename__ = 'transactions'
 
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String, nullable=False)
-    last_name = db.Column(db.String, nullable=False)
+    id = db.Column( db.Integer, primary_key = True )
 
-    reviews = db.relationship('Review', back_populates='customer')
-
-    hotels = association_proxy('reviews', 'hotel',
-        creator=lambda h: Review(hotel=h))
-
-    __table_args__ = (
-        db.CheckConstraint('(first_name != last_name)'),
-    )
-
-    @validates('first_name', 'last_name')
-    def validate_first_name(self, key, value):
-        if value is None:
-            raise ValueError(f"{key} cannot be null.")
-        elif len(value) < 4:
-            raise ValueError(f"{key} must be at least 4 characters long.")
-        return value
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, onupdate=db.func.now())
     
+    user_id = db.Column( db.Integer, db.ForeignKey('users.id') )
+    product_id = db.Column( db.Integer, db.ForeignKey('products.id') )
+
+    # Add relationships
+    user = db.relationship('User', back_populates="transactions")
+    product = db.relationship('Product', back_populates="transactions")
+
+    # Add serialization rules
+    serialize_rules = ('-user', '-product')
+
     def __repr__(self):
-        return f"Customer # {self.id}: {self.first_name} {self.last_name}"
+        return f'<Transaction user_id={self.user_id} product_id={self.product_id}>'
+
+
+class CartItem(db.Model, SerializerMixin):
+    __tablename__ = 'cartitems'
+
+    id = db.Column( db.Integer, primary_key = True)
+    created_at = db.Column( db.DateTime, server_default = db.func.now() )
+    update_at = db.Column( db.DateTime, onupdate = db.func.now() )
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+
+    # Add relationships
+    user = db.relationship('User', back_populates="cartitems")
+    product = db.relationship('Product', back_populates="cartitems")
+
+    # Add serialization rules
+    serialize_rules = ('-user', '-product')
+
+    def __repr__( self ):
+        return f'<CartItem user_id={self.user_id} product_id={self.product_id}>'
+        # return f"{{ CartItem { self.id } }}"
+
+class Product(db.Model, SerializerMixin):
+    __tablename__ = 'products'
+
+    id = db.Column( db.Integer, primary_key = True)
+    name  = db.Column ( db.String, nullable = False )
+    price = db.Column ( db.Integer )
+    description = db.Column ( db.String )
+    units = db.Column ( db.Integer )
+    units_sold = db.Column ( db.Integer )
+    image= db.Column ( db.Integer )
+
+    # Add relationships
+    cartitems = db.relationship( 'CartItem', back_populates='product' )
+    transactions = db.relationship( 'Transaction', back_populates='product' )
+
+    serialize_rules = ( '-cartitems', '-transactions' )
+
+    # created_at = db.Column( db.DateTime, server_default = db.func.now() )
+    # update_at = db.Column( db.DateTime, onupdate = db.func.now() )
+
+    def __repr__( self ):
+        return f'<Product name= {self.name} price= {self.price} units= {self.units}>'
+        # return f"{{ Product { self.id } }}"
+
+# Model templates!
+# class NameOfClass (db.Model) :
+#     __tablename__ = 'name of class plural'
+
+#     id = db.Column( db.Integer, primary_key = True)
+#     created_at = db.Column( db.DateTime, server_default = db.func.now() )
+#     update_at = db.Column( db.DateTime, onupdate = db.func.now() )
+
+#     table_column_id = db.Column( db.Integer, db.ForeignKey( 'table.id' ))
+
+#     def __repr__( self ):
+#         return f"{{ ModelName { self.id } }}"
+
+#     validation_errors = []
+
+#     def get_validation_errors( self ):
+#         return list( set( self.validation_errors ))
+
+#     @classmethod
+#     def clear_validation_errors( cls ): 
+#         cls.validation_errors = []
+
+#     Password stuff for user model!
+#     @hybrid_property
+#     def password_hash( self ):
+#         return self._password_hash
+
+#     @password_hash.setter
+#     def password_hash( self, password):
+#         if ***password validation goes in here!!!***:
+#             password_hash = bcrypt.generate_password_hash (password.encode( 'utf-8' ))
+#             self._password_hash = password_hash.decode( 'utf-8' )
+#         else:
+#             self.validation_errors.append( "Password validation error goes here!" )
     
-class Review(db.Model, SerializerMixin):
-    __tablename__ = 'reviews'
-
-    serialize_rules = ('-hotel.reviews', '-customer.reviews')
-
-    id = db.Column(db.Integer, primary_key=True)
-    rating = db.Column(db.Integer)
-
-    hotel_id = db.Column(db.Integer, db.ForeignKey('hotels.id'))
-    customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'))
-
-    hotel = db.relationship('Hotel', back_populates='reviews')
-    customer = db.relationship('Customer', back_populates='reviews')
-
-    def __repr__(self):
-        return f"Review # {self.id}: {self.customer.first_name} {self.customer.last_name} left of a review for {self.hotel.name} with a rating of {self.rating}."
+#     def authenticate( self, password):
+#         return bcrypt.check_password_hash( self._password_hash, password.encode( 'utf-8' ))

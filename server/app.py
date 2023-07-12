@@ -7,11 +7,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
 from flask_cors import CORS
+from flask_bcrypt import Bcrypt
 
-from models import db, Hotel, Customer, Review
+from models import db, User, CartItem, Product, Transaction
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hotels.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///beverages.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 
@@ -19,286 +20,313 @@ migrate = Migrate(app, db)
 
 db.init_app(app)
 
-# CORS(app)
+CORS(app)
 
 api = Api(app)
 
-class Hotels(Resource):
-
+class Products(Resource):
+    
     def get(self):
-        hotels = Hotel.query.all()
+        products = Product.query.all()
 
         response_body = []
 
-        for hotel in hotels:
-            response_body.append(hotel.to_dict())
-
-        return make_response(jsonify(response_body), 200)
-
-    def post(self):
-        try:
-            new_hotel = Hotel(name=request.get_json().get('name'), image=request.get_json().get('image'))
-            db.session.add(new_hotel)
-            db.session.commit()
-
-            response_body = new_hotel.to_dict()
-            
-            return make_response(jsonify(response_body), 201)
-        except ValueError as error:
-            response_body = {
-                "error": error.args
-            }
-            return make_response(jsonify(response_body), 422)
-
-
-api.add_resource(Hotels, '/hotels')
-
-class HotelById(Resource):
-
-    def get(self, id):
-        hotel = Hotel.query.filter(Hotel.id == id).first()
-
-        if not hotel:
-            response_body = {
-                "error": "Hotel not found"
-            }
-            status = 404
-
-        else:
-            response_body = hotel.to_dict()
-            customer_list = []
-            for customer in list(set(hotel.customers)):
-                customer_list.append({
-                    "id": customer.id,
-                    "first_name": customer.first_name,
-                    "last_name": customer.last_name
-                })
-            response_body.update({"customers": customer_list})
-            status = 200
-
-        return make_response(jsonify(response_body), status)
-    
-    def patch(self, id):
-        hotel = Hotel.query.filter(Hotel.id == id).first()
-
-        if not hotel:
-            response_body = {
-                "error": "Hotel not found"
-            }
-            return make_response(jsonify(response_body), 404)
-
-        else:
-            try:
-                json_data = request.get_json()
-                for key in json_data:
-                    setattr(hotel, key, json_data.get(key))
-                db.session.commit()
-
-                response_body = hotel.to_dict()
-                return make_response(jsonify(response_body), 200)
-            
-            except ValueError as error:
-                
-                response_body = {
-                    "error": error.args
-                }
-                
-                return make_response(jsonify(response_body), 422)
-    
-    def delete(self, id):
-        hotel = Hotel.query.filter(Hotel.id == id).first()
-
-        if not hotel:
-            response_body = {
-                "error": "Hotel not found"
-            }
-            status = 404
-
-        else:
-            db.session.delete(hotel)
-            db.session.commit()
-
-            response_body = {}
-            status = 204
-
-        return make_response(jsonify(response_body), status)
-
-
-api.add_resource(HotelById, '/hotels/<int:id>')
-
-class Customers(Resource):
-
-    def get(self):
-        customers = Customer.query.all()
-
-        response_body = []
-        for customer in customers:
-            response_body.append(customer.to_dict())
+        for product in products:
+            response_body.append(product.to_dict(only = ("id", "name", "description", "price", "description", "units")))
         
         return make_response(jsonify(response_body), 200)
-    
-    def post(self):
-        try:
-            new_customer = Customer(first_name=request.get_json().get('first_name'), last_name=request.get_json().get('last_name'))
 
-            db.session.add(new_customer)
-            db.session.commit()
+api.add_resource(Products, "/products")
+
+
+class Users(Resource):
+    
+    pass
+
+class CartItems(Resource):
+    pass
+
+class Transactions(Resource):
+    pass
+
+
+
+# class Hotels(Resource):
+
+#     def get(self):
+#         hotels = Hotel.query.all()
+
+#         response_body = []
+
+#         for hotel in hotels:
+#             response_body.append(hotel.to_dict())
+
+#         return make_response(jsonify(response_body), 200)
+
+#     def post(self):
+#         try:
+#             new_hotel = Hotel(name=request.get_json().get('name'), image=request.get_json().get('image'))
+#             db.session.add(new_hotel)
+#             db.session.commit()
+
+#             response_body = new_hotel.to_dict()
             
-            return make_response(jsonify(new_customer.to_dict()), 201)
-        except ValueError as error:
-            response_body = {
-                "error": error.args
-            }
-            return make_response(jsonify(response_body), 422)
+#             return make_response(jsonify(response_body), 201)
+#         except ValueError as error:
+#             response_body = {
+#                 "error": error.args
+#             }
+#             return make_response(jsonify(response_body), 422)
 
-api.add_resource(Customers, '/customers')
 
-class CustomerById(Resource):
+# api.add_resource(Hotels, '/hotels')
 
-    def get(self, id):
-        customer = Customer.query.filter(Customer.id == id).first()
+# class HotelById(Resource):
 
-        if not customer:
-            response_body = {
-                "error": "Customer not found"
-            }
-            status = 404
-        else:
-            response_body = customer.to_dict()
-            status = 200
+#     def get(self, id):
+#         hotel = Hotel.query.filter(Hotel.id == id).first()
 
-        return make_response(jsonify(response_body), status)
+#         if not hotel:
+#             response_body = {
+#                 "error": "Hotel not found"
+#             }
+#             status = 404
+
+#         else:
+#             response_body = hotel.to_dict()
+#             customer_list = []
+#             for customer in list(set(hotel.customers)):
+#                 customer_list.append({
+#                     "id": customer.id,
+#                     "first_name": customer.first_name,
+#                     "last_name": customer.last_name
+#                 })
+#             response_body.update({"customers": customer_list})
+#             status = 200
+
+#         return make_response(jsonify(response_body), status)
     
-    def patch(self, id):
-        customer = Customer.query.filter(Customer.id == id).first()
+#     def patch(self, id):
+#         hotel = Hotel.query.filter(Hotel.id == id).first()
 
-        if not customer:
-            response_body = {
-                "error": "Customer not found"
-            }
-            return make_response(jsonify(response_body), 404)
-        else:
-            try:
-                json_data = request.get_json()
+#         if not hotel:
+#             response_body = {
+#                 "error": "Hotel not found"
+#             }
+#             return make_response(jsonify(response_body), 404)
+
+#         else:
+#             try:
+#                 json_data = request.get_json()
+#                 for key in json_data:
+#                     setattr(hotel, key, json_data.get(key))
+#                 db.session.commit()
+
+#                 response_body = hotel.to_dict()
+#                 return make_response(jsonify(response_body), 200)
+            
+#             except ValueError as error:
                 
-                for key in json_data:
-                    setattr(customer, key, json_data.get(key))
-
-                db.session.commit()
-
-                response_body = customer.to_dict()
-
-                return make_response(jsonify(response_body), 200)
-            except ValueError as error:
-                response_body = {
-                    "error": error.args
-                }
-                return make_response(jsonify(response_body), 422)
+#                 response_body = {
+#                     "error": error.args
+#                 }
+                
+#                 return make_response(jsonify(response_body), 422)
     
-    def delete(self, id):
-        customer = Customer.query.filter(Customer.id == id).first()
-        
-        if not customer:
+#     def delete(self, id):
+#         hotel = Hotel.query.filter(Hotel.id == id).first()
 
-            response_body = {
-                "error": "Customer not found"
-            }
-            status = 404
+#         if not hotel:
+#             response_body = {
+#                 "error": "Hotel not found"
+#             }
+#             status = 404
+
+#         else:
+#             db.session.delete(hotel)
+#             db.session.commit()
+
+#             response_body = {}
+#             status = 204
+
+#         return make_response(jsonify(response_body), status)
+
+
+# api.add_resource(HotelById, '/hotels/<int:id>')
+
+# class Customers(Resource):
+
+#     def get(self):
+#         customers = Customer.query.all()
+
+#         response_body = []
+#         for customer in customers:
+#             response_body.append(customer.to_dict())
         
-        else:
+#         return make_response(jsonify(response_body), 200)
+    
+#     def post(self):
+#         try:
+#             new_customer = Customer(first_name=request.get_json().get('first_name'), last_name=request.get_json().get('last_name'))
+
+#             db.session.add(new_customer)
+#             db.session.commit()
             
-            db.session.delete(customer)
-            db.session.commit()
+#             return make_response(jsonify(new_customer.to_dict()), 201)
+#         except ValueError as error:
+#             response_body = {
+#                 "error": error.args
+#             }
+#             return make_response(jsonify(response_body), 422)
 
-            response_body = {}
-            status = 204
+# api.add_resource(Customers, '/customers')
 
-        return make_response(jsonify(response_body), status)
+# class CustomerById(Resource):
 
-api.add_resource(CustomerById, '/customers/<int:id>')
+#     def get(self, id):
+#         customer = Customer.query.filter(Customer.id == id).first()
 
-class Reviews(Resource):
+#         if not customer:
+#             response_body = {
+#                 "error": "Customer not found"
+#             }
+#             status = 404
+#         else:
+#             response_body = customer.to_dict()
+#             status = 200
 
-    def get(self):
-        reviews = Review.query.all()
-
-        response_body = []
-
-        for review in reviews:
-            response_body.append(review.to_dict())
-
-        return make_response(jsonify(response_body), 200)
+#         return make_response(jsonify(response_body), status)
     
-    def post(self):
-        json_data = request.get_json()
-        new_review = Review(hotel_id=json_data.get('hotel_id'), customer_id=json_data.get('customer_id'), rating=json_data.get('rating'))
-        db.session.add(new_review)
-        db.session.commit()
+#     def patch(self, id):
+#         customer = Customer.query.filter(Customer.id == id).first()
 
-        response_body = new_review.to_dict()
+#         if not customer:
+#             response_body = {
+#                 "error": "Customer not found"
+#             }
+#             return make_response(jsonify(response_body), 404)
+#         else:
+#             try:
+#                 json_data = request.get_json()
+                
+#                 for key in json_data:
+#                     setattr(customer, key, json_data.get(key))
+
+#                 db.session.commit()
+
+#                 response_body = customer.to_dict()
+
+#                 return make_response(jsonify(response_body), 200)
+#             except ValueError as error:
+#                 response_body = {
+#                     "error": error.args
+#                 }
+#                 return make_response(jsonify(response_body), 422)
+    
+#     def delete(self, id):
+#         customer = Customer.query.filter(Customer.id == id).first()
         
-        return make_response(jsonify(response_body), 201)
-    
-api.add_resource(Reviews, '/reviews')
+#         if not customer:
 
-class ReviewById(Resource):
-
-    def get(self, id):
-        review = Review.query.filter(Review.id == id).first()
-
-        if not review:
-            response_body = {
-                "error": "Review not found"
-            }
-            status = 404
-        else:
-            response_body = review.to_dict()
-            status = 200
-
-        return make_response(jsonify(response_body), status)
-    
-    def patch(self, id):
-        review = Review.query.filter(Review.id == id).first()
-
-        if not review:
-            response_body = {
-                "error": "Review not found"
-            }
-            status = 404
-        else:
-            json_data = request.get_json()
-
-            for key in json_data:
-                setattr(review, key, json_data.get(key))
-
-            db.session.commit()
-
-            response_body = review.to_dict()
-            status = 200
-
-        return make_response(jsonify(response_body), status)
-    
-    def delete(self, id):
-        review = Review.query.filter(Review.id == id).first()
+#             response_body = {
+#                 "error": "Customer not found"
+#             }
+#             status = 404
         
-        if not review:
-
-            response_body = {
-                "error": "Review not found"
-            }
-            status = 404
-        
-        else:
+#         else:
             
-            db.session.delete(review)
-            db.session.commit()
+#             db.session.delete(customer)
+#             db.session.commit()
 
-            response_body = {}
-            status = 204
+#             response_body = {}
+#             status = 204
 
-        return make_response(jsonify(response_body), status)
+#         return make_response(jsonify(response_body), status)
 
-api.add_resource(ReviewById, '/reviews/<int:id>')
+# api.add_resource(CustomerById, '/customers/<int:id>')
+
+# class Reviews(Resource):
+
+#     def get(self):
+#         reviews = Review.query.all()
+
+#         response_body = []
+
+#         for review in reviews:
+#             response_body.append(review.to_dict())
+
+#         return make_response(jsonify(response_body), 200)
+    
+#     def post(self):
+#         json_data = request.get_json()
+#         new_review = Review(hotel_id=json_data.get('hotel_id'), customer_id=json_data.get('customer_id'), rating=json_data.get('rating'))
+#         db.session.add(new_review)
+#         db.session.commit()
+
+#         response_body = new_review.to_dict()
+        
+#         return make_response(jsonify(response_body), 201)
+    
+# api.add_resource(Reviews, '/reviews')
+
+# class ReviewById(Resource):
+
+#     def get(self, id):
+#         review = Review.query.filter(Review.id == id).first()
+
+#         if not review:
+#             response_body = {
+#                 "error": "Review not found"
+#             }
+#             status = 404
+#         else:
+#             response_body = review.to_dict()
+#             status = 200
+
+#         return make_response(jsonify(response_body), status)
+    
+#     def patch(self, id):
+#         review = Review.query.filter(Review.id == id).first()
+
+#         if not review:
+#             response_body = {
+#                 "error": "Review not found"
+#             }
+#             status = 404
+#         else:
+#             json_data = request.get_json()
+
+#             for key in json_data:
+#                 setattr(review, key, json_data.get(key))
+
+#             db.session.commit()
+
+#             response_body = review.to_dict()
+#             status = 200
+
+#         return make_response(jsonify(response_body), status)
+    
+#     def delete(self, id):
+#         review = Review.query.filter(Review.id == id).first()
+        
+#         if not review:
+
+#             response_body = {
+#                 "error": "Review not found"
+#             }
+#             status = 404
+        
+#         else:
+            
+#             db.session.delete(review)
+#             db.session.commit()
+
+#             response_body = {}
+#             status = 204
+
+#         return make_response(jsonify(response_body), status)
+
+# api.add_resource(ReviewById, '/reviews/<int:id>')
 
 if __name__ == '__main__':
-    app.run(port=7000, debug=True)
+    app.run(port=5555, debug=True)
