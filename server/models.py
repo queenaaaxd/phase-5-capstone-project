@@ -123,7 +123,7 @@ class Product(db.Model, SerializerMixin):
     description = db.Column ( db.String )
     units = db.Column ( db.Integer )
     units_sold = db.Column ( db.Integer )
-    image= db.Column ( db.Integer )
+    image= db.Column ( db.String )
 
     # Add relationships
     cartitems = db.relationship( 'CartItem', back_populates='product' )
@@ -135,7 +135,7 @@ class Product(db.Model, SerializerMixin):
     # update_at = db.Column( db.DateTime, onupdate = db.func.now() )
 
     def __repr__( self ):
-        return f'<Product name= {self.name} price= {self.price} units= {self.units}>'
+        return f'<Product name= {self.name} price= {self.price} image= {self.image} units= {self.units}>'
         # return f"{{ Product { self.id } }}"
 
 # Model templates!

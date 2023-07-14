@@ -32,11 +32,12 @@ class Products(Resource):
         response_body = []
 
         for product in products:
-            response_body.append(product.to_dict(only = ("id", "name", "description", "price", "description", "units")))
+            response_body.append(product.to_dict(only = ("id", "name", "description", "price", "description", "image", "units")))
         
         return make_response(jsonify(response_body), 200)
 
 api.add_resource(Products, "/products")
+
 
 
 class Users(Resource):

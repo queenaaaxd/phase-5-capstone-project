@@ -1,15 +1,18 @@
-import {NavLink} from "react-router-dom"
+import React from "react";
+import { NavLink } from "react-router-dom";
+import { ShoppingCartSimple, HouseLine, User, SquaresFour, PencilLine, Scroll } from "phosphor-react";
 
 function NavBar(){
     return (
         <nav>
             <div className='navbar'>
-                <NavLink to="/">home</NavLink>
-                <NavLink to="/add_hotel">signup</NavLink>
-                <NavLink to="/add_hotel">login</NavLink>
-                <NavLink to="/add_hotel">cart</NavLink>
-                <NavLink to="/update_hotel">orders</NavLink>
-                
+                <NavLink to="/home"><HouseLine size={32} /></NavLink>
+                <NavLink to="/products"><SquaresFour size={32} /></NavLink>
+                <NavLink to="/signup"><PencilLine size={32}/></NavLink>
+                <NavLink to="/login"><User size={32}/></NavLink>
+                <NavLink to="/cart"><ShoppingCartSimple size={32}/></NavLink>
+                <NavLink to="/transaction"><Scroll size={32}/></NavLink>
+            
             </div>
         </nav>
     )
