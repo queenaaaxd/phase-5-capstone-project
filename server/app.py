@@ -38,13 +38,40 @@ class Products(Resource):
 
 api.add_resource(Products, "/products")
 
-
-
 class Users(Resource):
     
     pass
 
 class CartItems(Resource):
+    # def get(self):
+    #     cart_items_dict = [cart_items.to_dict() for cart_items in Cart_Item.query.all()]
+
+    #     response = make_response(
+    #         cart_items_dict,
+    #         200
+    #     )
+
+    #     return response
+
+    # def post(self):
+        
+    #     new_cart_item = Cart_Item(
+    #         product_id = request.json['product_id'],
+    #         shopping_session_id = request.json['shopping_session_id']
+    #     )
+
+    #     db.session.add(new_cart_item)
+    #     db.session.commit()
+
+    #     cart_item_dict = new_cart_item.to_dict()
+        
+    #     response = make_response(
+    #         cart_item_dict,
+    #         201
+    #     )
+    #     return response
+        
+# api.add_resource(Cart_Items, '/cart_items')
     pass
 
 class Transactions(Resource):

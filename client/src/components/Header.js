@@ -1,14 +1,10 @@
 function Header(){
     return (
       <header>
-          <span className="logo" role="img">
-            <img
-              src="/Users/queenafeng/Desktop/Development/capstone/phase-5-capstone-project/client/src/images/beverages.png"
-              alt="drinks"
-            />
+          <span className="logo">
           </span>
         <h1>
-        beverages
+        effin' beverage
         </h1>
       </header>
     );

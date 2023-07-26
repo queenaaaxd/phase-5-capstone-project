@@ -5,10 +5,10 @@ import React, { useState, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import NavBar from "./NavBar";
-import Header from "./Header"; 
+import Header from "./Header";
 import Home from "./Home";
 import ProductPage from "./ProductPage";
-import ProductCard from "./ProductCard";
+// import ProductCard from "./ProductCard";
 
 function App() {
   // setting and populated
@@ -26,22 +26,19 @@ function App() {
 
   return (
     <div className="App">
-        <Header />
-        <NavBar />
-        <Routes>
-          <Route path="/home" element={<Home />} />
-          <Route
-            path="/products"
-            element={<ProductPage products={products} />}
-          />
-          <Route path="/signup" element={<ProductPage products={products} />} />
-          <Route path="/login" element={<ProductPage products={products} />} />
-          <Route path="/cart" element={<ProductPage products={products} />} />
-          <Route
-            path="/transaction"
-            element={<ProductPage products={products} />}
-          />
-        </Routes>
+      <Header />
+      <NavBar />
+      <Routes>
+        <Route path="/home" element={<Home />} />
+        <Route path="/products" element={<ProductPage products={products} />} />
+        <Route path="/signup" element={<ProductPage products={products} />} />
+        <Route path="/login" element={<ProductPage products={products} />} />
+        <Route path="/cart" element={<ProductPage products={products} />} />
+        <Route
+          path="/transaction"
+          element={<ProductPage products={products} />}
+        />
+      </Routes>
     </div>
   );
 }
