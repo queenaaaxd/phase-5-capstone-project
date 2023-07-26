@@ -17,7 +17,7 @@ class User(db.Model, SerializerMixin) :
 
     id = db.Column( db.Integer, primary_key = True)
     email = db.Column( db.String, nullable = False, unique = True )
-    password_hash = db.Column( db.String, nullable = False )
+    password = db.Column( db.String, nullable = False )
     admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
@@ -37,6 +37,20 @@ class User(db.Model, SerializerMixin) :
         # print(f'<User email={self.email} id={self.id}>')
         return f"{{ User { self.id } }}"
 
+    @validates( 'email' )
+    def validate_email( self, key, email ):
+        if type(email) is str and email and '@' in email and '.' in email:
+            return email
+        else:
+            raise ValueError(f"{key} must be a valid email address.")
+
+    # @validates( 'password' )
+    # def validate_password(self, key, password):
+    #     if len(password) > 6:
+    #         return password
+    #     else:
+    #         raise ValueError(f"{key} must be more than 6 characters long.")
+
     # validation_errors = [] 
 
     # def get_validation_errors( self ):
@@ -45,13 +59,6 @@ class User(db.Model, SerializerMixin) :
     # @classmethod
     # def clear_validation_errors( cls ): 
     #     cls.validation_errors = []
-
-    # @validates( 'email' )
-    # def validate_email( self, key, email ):
-    #     if type(email) is str and email and '@' in email and '.' in email:
-    #         return email
-    #     else:
-    #         raise ValueError(f"{key} must be a valid email address.")
 
     # #Password stuff for user model!
     # @hybrid_property
@@ -175,3 +182,19 @@ class Product(db.Model, SerializerMixin):
     
 #     def authenticate( self, password):
 #         return bcrypt.check_password_hash( self._password_hash, password.encode( 'utf-8' ))
+
+
+
+# 07/26
+# add at least two validations POST/UPDATE that effects
+# - username 
+# - name of username of first/last name
+
+# full CRUD on Users
+# Create post users/signup
+# Get login/logout keeping user's logged in and log out
+# Patch update user's info
+# Delete user's account
+# cookies
+
+# built 5 routes 

@@ -5,6 +5,7 @@ function Search( {search, setSearch} ) {
     console.log(setSearch)
     return (
         <div className="searchbar">
+            <h1>SEARCH</h1>
             <label htmlFor="search">Search : </label>
             <input
                 type="text"

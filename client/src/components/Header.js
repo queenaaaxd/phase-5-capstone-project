@@ -4,7 +4,7 @@ function Header(){
           <span className="logo">
           </span>
         <h1>
-        effin' beverage
+        Simply Beverages, easy peasy lemon squeezy.
         </h1>
       </header>
     );
