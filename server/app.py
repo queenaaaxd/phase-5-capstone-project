@@ -7,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
 from flask_cors import CORS
-from flask_bcrypt import Bcrypt
+# from flask_bcrypt import Bcrypt
 
 from models import db, User, CartItem, Product, Transaction
 
@@ -24,6 +24,10 @@ CORS(app)
 
 api = Api(app)
 
+@app.route('/')
+def index():
+    return "<h2>simply beverage's db</h2>"
+
 class Products(Resource):
     
     def get(self):
@@ -39,8 +43,86 @@ class Products(Resource):
 api.add_resource(Products, "/products")
 
 class Users(Resource):
+    def get(self):
+        users = User.query.all()
+
+        response_body = []
+
+        for user in users:
+            response_body.append(user.to_dict(only = ('id', 'email', 'password', 'admin' )))
+
+        return make_response(jsonify(response_body), 200)
+        
+    def post(self):
+        json_data = request.get_json()
+        new_user = User(email=json_data.get('email'), password=json_data.get('password'), admin=json_data.get('admin'))
+        db.session.add(new_user)
+        db.session.commit()
+
+        response_body = new_user.to_dict()
+
+        return make_response(jsonify(response_body), 201)
+
+api.add_resource(Users, '/users')
+
+class UsersById(Resource):
+    def get(self, id):
+        user = User.query.filter(User.id == id).first()
+
+        if not user:
+            response_body = {
+                "error": "user not found"
+            }
+            status = 404
+        else:
+            response_body = user.to_dict(only=('id','email','admin'))
+            status = 200
+        
+        return make_response(jsonify(response_body), status)
     
-    pass
+    def patch(self, id):
+        user = User.query.filter(User.id == id).first()
+
+        if not user:
+            response_body = {
+                "error": "user not found"
+            }
+            status = 404
+        else:
+            json_data = request.get_json()
+
+            for key in json_data:
+                setattr(user, key, json_data.get(key))
+
+                db.session.commit()
+
+                response_body = user.to_dict()
+                status = 200
+            
+            return make_response(jsonify(response_body), status)
+        
+    def delete(self, id):
+        user = User.query.filter(User.id == id).first()
+
+        if not user:
+
+            response_body = {
+                "error": "user not found"
+            }
+            status = 404
+
+        else:
+
+            db.session.delete(user)
+            db.session.commit()
+
+            response_body = {}
+
+            status = 204
+
+        return make_response(jsonify(response_body), status)
+
+api.add_resource(UsersById, '/users/<int:id>')
 
 class CartItems(Resource):
     # def get(self):

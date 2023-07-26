@@ -26,23 +26,21 @@ function App() {
 
   // console.log(products);
 
-
   // post new user to backend
   function addUser(event) {
-    event.preventDefault()
+    event.preventDefault();
 
-    fetch('/users', {
+    fetch("http://127.0.0.1:5555/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Accept": "application/json"
+        Accept: "application/json",
       },
-      body: JSON.stringify(postFormData)
+      body: JSON.stringify(postFormData),
     })
-      .then(res => res.json())
-      .then(newUser => setUsers(users => [...users, newUser]))
+      .then((res) => res.json())
+      .then((newUser) => setUsers((users) => [...users, newUser]));
   }
-
 
   // state for signup input
   const [postFormData, setPostFormData] = useState({});
@@ -62,7 +60,12 @@ function App() {
       <Routes>
         <Route path="/home" element={<Home />} />
         <Route path="/products" element={<ProductPage products={products} />} />
-        <Route path="/signup" element={<Signup updatePostFormData={updatePostFormData} addUser={addUser} />} />
+        <Route
+          path="/signup"
+          element={
+            <Signup updatePostFormData={updatePostFormData} addUser={addUser} />
+          }
+        />
         <Route path="/login" element={<ProductPage products={products} />} />
         <Route path="/cart" element={<ProductPage products={products} />} />
         <Route

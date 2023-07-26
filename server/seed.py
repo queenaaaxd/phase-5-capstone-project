@@ -23,16 +23,16 @@ with app.app_context():
     db.session.add_all(products)
     
     users = []
-    users.append(User( email='admin1@gmail.com', password_hash='password', admin=True ))
-    users.append(User( email='testing2@gmail.com', password_hash='password', admin=False ))
-    users.append(User( email='testing3@gmail.com', password_hash='password', admin=False ))
-    users.append(User( email='testing4@gmail.com', password_hash='password', admin=False ))
-    users.append(User( email='testing5@gmail.com', password_hash='password', admin=False ))
-    users.append(User( email='testing6@gmail.com', password_hash='password', admin=False ))
-    users.append(User( email='testing7@gmail.com', password_hash='password', admin=False ))
-    users.append(User( email='testing8@gmail.com', password_hash='password', admin=False ))
-    users.append(User( email='testing9@gmail.com', password_hash='password', admin=False ))
-    users.append(User( email='testing10@gmail.com', password_hash='password', admin=False ))
+    users.append(User( email='admin1@gmail.com', password='password', admin=True ))
+    users.append(User( email='testing2@gmail.com', password='password', admin=False ))
+    users.append(User( email='testing3@gmail.com', password='password', admin=False ))
+    users.append(User( email='testing4@gmail.com', password='password', admin=False ))
+    users.append(User( email='testing5@gmail.com', password='password', admin=False ))
+    users.append(User( email='testing6@gmail.com', password='password', admin=False ))
+    users.append(User( email='testing7@gmail.com', password='password', admin=False ))
+    users.append(User( email='testing8@gmail.com', password='password', admin=False ))
+    users.append(User( email='testing9@gmail.com', password='password', admin=False ))
+    users.append(User( email='testing10@gmail.com', password='password', admin=False ))
     db.session.add_all(users)
 
 
