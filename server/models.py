@@ -13,6 +13,7 @@ db = SQLAlchemy(metadata=metadata)
 
 # Models go here!
 class User(db.Model, SerializerMixin) :
+    
     __tablename__ = 'users'
 
     id = db.Column( db.Integer, primary_key = True)
@@ -130,8 +131,8 @@ class Product(db.Model, SerializerMixin):
     description = db.Column ( db.String )
     units = db.Column ( db.Integer )
     units_sold = db.Column ( db.Integer )
-    image= db.Column ( db.String )
-
+    image = db.Column ( db.String )
+    
     # Add relationships
     cartitems = db.relationship( 'CartItem', back_populates='product' )
     transactions = db.relationship( 'Transaction', back_populates='product' )

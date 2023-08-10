@@ -9,13 +9,32 @@ import Header from "./Header";
 import Home from "./Home";
 import ProductPage from "./ProductPage";
 import Signup from "./Signup";
+import Login from "./Login";
+import Cart from "./Cart";
 // import ProductCard from "./ProductCard";
 
 function App() {
   // setting and populated
   const [products, setProducts] = useState([]);
-  const [users, setUsers] = useState([]);
 
+  // keeep track of users in the frontend
+  const [users, setUsers] = useState(null);
+
+  console.log(users);
+
+  const [cartContents, setCartContents] = useState([]);
+
+  function addToCart(productId, quantity) {
+    const existingIndex = cartContents.findIndex(item => item.productId === productId)
+    if (existingIndex !== -1) {
+      const updatedCart = [...cartContents]
+      updatedCart[existingIndex].quantity += quantity;
+      setCartContents(updatedCart)
+    } else {
+      setCartContents([...cartContents, { productId, quantity }])
+    }
+  }
+  
   // fetch from my backend
   useEffect(() => {
     fetch("http://127.0.0.1:5555/products")
@@ -45,6 +64,9 @@ function App() {
   // state for signup input
   const [postFormData, setPostFormData] = useState({});
 
+
+
+
   function updatePostFormData(event) {
     setPostFormData({
       ...postFormData,
@@ -59,15 +81,18 @@ function App() {
       <NavBar />
       <Routes>
         <Route path="/home" element={<Home />} />
-        <Route path="/products" element={<ProductPage products={products} />} />
+        <Route
+          path="/products"
+          element={<ProductPage addToCart={addToCart} products={products} />}
+        />
         <Route
           path="/signup"
           element={
             <Signup updatePostFormData={updatePostFormData} addUser={addUser} />
           }
         />
-        <Route path="/login" element={<ProductPage products={products} />} />
-        <Route path="/cart" element={<ProductPage products={products} />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/cart" element={<Cart />} />
         <Route
           path="/transaction"
           element={<ProductPage products={products} />}

@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import ProductList from "./ProductList";
 import Search from "./Search";
 
-function ProductPage({ products }) {
+function ProductPage({ products, addToCart }) {
 
     const [search, setSearch] = useState("");
 
@@ -15,7 +15,7 @@ function ProductPage({ products }) {
     return (
         <main>
             <Search search={ search } setSearch={ setSearch } />
-            <ProductList products = {products} />
+            <ProductList products = {products} addToCart= {addToCart} />
         </main>
     );
 }

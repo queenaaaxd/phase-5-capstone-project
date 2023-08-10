@@ -12,9 +12,14 @@ from flask_cors import CORS
 from models import db, User, CartItem, Product, Transaction
 
 app = Flask(__name__)
+
+app.secret_key = "ABC123"; # signature for Flask session
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///beverages.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
+
+# bcrypt = Bcrypt(app)
 
 migrate = Migrate(app, db)
 
@@ -26,7 +31,7 @@ api = Api(app)
 
 @app.route('/')
 def index():
-    return "<h2>simply beverage's db</h2>"
+    return "Simply beverage's"
 
 class Products(Resource):
     
