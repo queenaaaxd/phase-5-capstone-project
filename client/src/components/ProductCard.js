@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 
-function ProductList({ product, addToCart }) {
-  const [quantity, setQuantity] = useState(1);
+function ProductList({ product }) {
+//   const [quantity, setQuantity] = useState(1);
 
-  const handleQuantityChange = (e) => {
-    setQuantity(parseInt(e.target.value));
-  };
+//   const handleQuantityChange = (e) => {
+//     setQuantity(parseInt(e.target.value));
+//   };
 
   console.log(product.image);
 
@@ -14,7 +14,7 @@ function ProductList({ product, addToCart }) {
       <img src={product.image} alt={product.name} />
       <h4>{product.name}</h4>
       <p>${product.price}</p>
-      <select value={quantity} onChange={handleQuantityChange}>
+      {/* <select value={quantity} onChange={handleQuantityChange}>
         <option key={1} value={1}>
           1
         </option>
@@ -31,7 +31,7 @@ function ProductList({ product, addToCart }) {
           5
         </option>
       </select>
-      <button onClick={addToCart(product)}>ADD TO CART</button>
+      <button onClick={addToCart(product)}>ADD TO CART</button> */}
     </li>
   );
 }

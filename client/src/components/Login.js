@@ -1,13 +1,34 @@
-import React, { useState } from "react";
+import React from "react";
 
-function Login() {
+function Login({handleLogin, updateFormData}) {
 
   return (
     <>
-    <h1>LOG IN</h1>
-    </>
+      <form onSubmit={handleLogin} className="login-form">
+        <input
+          onChange={updateFormData}
+          id="email"
+          type="text"
+          placeholder="email"
+        />
+        <input
+          onChange={updateFormData}
+          id="password"
+          type="password"
+          placeholder="password"
+        />
+        <button className="button" type="submit">
+          Login
+        </button>
+      </form>
 
-  )
+      <form className="login-form">
+        <button className="button">Logout</button>
+
+        <br />
+      </form>
+    </>
+  );
 }
 
 export default Login;

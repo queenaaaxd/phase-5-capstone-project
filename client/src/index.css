@@ -182,3 +182,13 @@ input:focus {
 .button:hover {
   background-color: #fff8e7;
 }
+
+.login-form {
+  border: 2px solid rgb(203, 192, 192);
+  margin: auto;
+  width: 35%;
+  padding: 50px;
+  margin-top: 55px;
+  background-color: #f3f3f2;
+}
+

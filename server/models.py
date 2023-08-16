@@ -45,6 +45,15 @@ class User(db.Model, SerializerMixin) :
         else:
             raise ValueError(f"{key} must be a valid email address.")
 
+    @validates('password')
+    def validate_password(self, key, password):
+        if type(password) is str and 6 <= len(password) <= 25:
+            return password
+        else:
+            raise ValueError(f"{key} must be b/t 6 and 26 characters")        
+    # add one more validation
+
+
     # @validates( 'password' )
     # def validate_password(self, key, password):
     #     if len(password) > 6:
